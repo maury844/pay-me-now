@@ -1,4 +1,5 @@
-import type { InputState, TermUnit } from '../types/app'
+import type { CurrencyCode, InputState, TermUnit } from '../types/app'
+import { getCurrencyInputLabel } from '../utils/format'
 import { Card } from './ui/Card'
 
 type InputsCardProps = {
@@ -6,7 +7,11 @@ type InputsCardProps = {
   termUnit: TermUnit
   termMonths: number
   variableTotalApr: string
+  currency: CurrencyCode
+  exchangeRate: number
   onTermUnitChange: (next: TermUnit) => void
+  onCurrencyChange: (next: CurrencyCode) => void
+  onExchangeRateChange: (value: string) => void
   onInputChange: (key: keyof InputState, value: string) => void
 }
 
@@ -39,15 +44,43 @@ export function InputsCard({
   termUnit,
   termMonths,
   variableTotalApr,
+  currency,
+  exchangeRate,
   onTermUnitChange,
+  onCurrencyChange,
+  onExchangeRateChange,
   onInputChange,
 }: InputsCardProps) {
+  const currencyLabel = getCurrencyInputLabel(currency)
+
   return (
     <Card className='lg:col-span-4'>
       <h2 className='mb-4 text-lg font-semibold text-slate-100'>Inputs</h2>
       <div className='space-y-3'>
+        <label className='block'>
+          <span className='mb-1 block text-sm text-slate-300'>Currency</span>
+          <select
+            value={currency}
+            onChange={(event) => onCurrencyChange(event.target.value as CurrencyCode)}
+            className='w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 focus:border-sky-400 focus:outline-none'
+          >
+            <option value='USD'>USD ($)</option>
+            <option value='BOB'>BOB</option>
+          </select>
+        </label>
+
+        {currency !== 'USD' ? (
+          <NumberField
+            label='Exchange rate (BOB per $1)'
+            value={exchangeRate}
+            min='0.0001'
+            step='0.0001'
+            onChange={onExchangeRateChange}
+          />
+        ) : null}
+
         <NumberField
-          label='Principal ($)'
+          label={`Principal (${currencyLabel})`}
           value={inputs.principal}
           min='0'
           onChange={(value) => onInputChange('principal', value)}
@@ -111,7 +144,7 @@ export function InputsCard({
         />
 
         <NumberField
-          label='Extra payment / month ($)'
+          label={`Extra payment / month (${currencyLabel})`}
           value={inputs.monthlyExtra}
           min='0'
           step='0.01'

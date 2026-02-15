@@ -1,5 +1,6 @@
 import { MetricCard } from './MetricCard'
-import { currencyFormatter, toMonthsLabel } from '../utils/format'
+import type { CurrencyCode } from '../types/app'
+import { formatCurrency, toMonthsLabel } from '../utils/format'
 
 type SummaryCardsProps = {
   baselinePayoffMonths: number
@@ -8,6 +9,8 @@ type SummaryCardsProps = {
   baselineTotalInterest: number
   extraTotalInterest: number
   interestAvoided: number
+  currency: CurrencyCode
+  exchangeRate: number
 }
 
 export function SummaryCards({
@@ -17,7 +20,26 @@ export function SummaryCards({
   baselineTotalInterest,
   extraTotalInterest,
   interestAvoided,
+  currency,
+  exchangeRate,
 }: SummaryCardsProps) {
+  const toSelectedCurrency = (usdAmount: number): number => {
+    if (currency === 'USD') return usdAmount
+    return usdAmount * exchangeRate
+  }
+
+  const moneyCardValues = (usdAmount: number): { value: string; subValue: string } => {
+    const selectedAmount = toSelectedCurrency(usdAmount)
+    return {
+      value: `${formatCurrency(selectedAmount, currency)} (${currency})`,
+      subValue: `$ equivalent: ${formatCurrency(usdAmount, 'USD')}`,
+    }
+  }
+
+  const baselineInterestDisplay = moneyCardValues(baselineTotalInterest)
+  const extraInterestDisplay = moneyCardValues(extraTotalInterest)
+  const interestAvoidedDisplay = moneyCardValues(interestAvoided)
+
   return (
     <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
       <MetricCard
@@ -33,15 +55,18 @@ export function SummaryCards({
       <MetricCard title='Months saved' value={`${monthsSaved}`} accent />
       <MetricCard
         title='Baseline total interest'
-        value={currencyFormatter.format(baselineTotalInterest)}
+        value={baselineInterestDisplay.value}
+        subValue={baselineInterestDisplay.subValue}
       />
       <MetricCard
         title='With-extra total interest'
-        value={currencyFormatter.format(extraTotalInterest)}
+        value={extraInterestDisplay.value}
+        subValue={extraInterestDisplay.subValue}
       />
       <MetricCard
         title='Interest avoided'
-        value={currencyFormatter.format(interestAvoided)}
+        value={interestAvoidedDisplay.value}
+        subValue={interestAvoidedDisplay.subValue}
         accent
       />
     </div>

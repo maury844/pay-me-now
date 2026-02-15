@@ -4,7 +4,7 @@ import { ComparisonCharts } from './components/ComparisonCharts'
 import { InputsCard } from './components/InputsCard'
 import { SummaryCards } from './components/SummaryCards'
 import { simulate } from './simulation'
-import type { InputState, TermUnit } from './types/app'
+import type { CurrencyCode, InputState, TermUnit } from './types/app'
 import { buildChartRows, toSafeNumber } from './utils/simulationView'
 
 const defaultInputs: InputState = {
@@ -20,6 +20,25 @@ const defaultInputs: InputState = {
 function App() {
   const [termUnit, setTermUnit] = useState<TermUnit>('years')
   const [inputs, setInputs] = useState<InputState>(defaultInputs)
+  const [currency, setCurrency] = useState<CurrencyCode>('USD')
+  const [exchangeRate, setExchangeRate] = useState(6.96)
+
+  const resolvedExchangeRate = useMemo(() => {
+    if (currency === 'USD') return 1
+    return Math.max(0.0001, toSafeNumber(exchangeRate))
+  }, [currency, exchangeRate])
+
+  const principalUsd = useMemo(() => {
+    const principal = toSafeNumber(inputs.principal)
+    if (currency === 'USD') return principal
+    return principal / resolvedExchangeRate
+  }, [currency, inputs.principal, resolvedExchangeRate])
+
+  const monthlyExtraUsd = useMemo(() => {
+    const monthlyExtra = toSafeNumber(inputs.monthlyExtra)
+    if (currency === 'USD') return monthlyExtra
+    return monthlyExtra / resolvedExchangeRate
+  }, [currency, inputs.monthlyExtra, resolvedExchangeRate])
 
   const termMonths = useMemo(() => {
     const rawMonths =
@@ -34,7 +53,7 @@ function App() {
   const baselineResult = useMemo(
     () =>
       simulate({
-        principal: toSafeNumber(inputs.principal),
+        principal: principalUsd,
         termMonths,
         fixedMonths,
         fixedApr: toSafeNumber(inputs.fixedApr),
@@ -46,9 +65,9 @@ function App() {
     [
       fixedMonths,
       inputs.fixedApr,
-      inputs.principal,
       inputs.tre,
       inputs.variableBaseApr,
+      principalUsd,
       termMonths,
     ],
   )
@@ -56,22 +75,22 @@ function App() {
   const extraResult = useMemo(
     () =>
       simulate({
-        principal: toSafeNumber(inputs.principal),
+        principal: principalUsd,
         termMonths,
         fixedMonths,
         fixedApr: toSafeNumber(inputs.fixedApr),
         variableBaseApr: toSafeNumber(inputs.variableBaseApr),
         tre: toSafeNumber(inputs.tre),
-        monthlyExtra: toSafeNumber(inputs.monthlyExtra),
+        monthlyExtra: monthlyExtraUsd,
         mode: 'KEEP_PAYMENT',
       }),
     [
       fixedMonths,
       inputs.fixedApr,
-      inputs.monthlyExtra,
-      inputs.principal,
       inputs.tre,
       inputs.variableBaseApr,
+      monthlyExtraUsd,
+      principalUsd,
       termMonths,
     ],
   )
@@ -100,6 +119,10 @@ function App() {
     }))
   }
 
+  const updateExchangeRate = (value: string) => {
+    setExchangeRate(Number(value))
+  }
+
   return (
     <main className='min-h-screen p-4 md:p-8'>
       <div className='mx-auto max-w-7xl space-y-4'>
@@ -114,7 +137,11 @@ function App() {
             termUnit={termUnit}
             termMonths={termMonths}
             variableTotalApr={variableTotalApr}
+            currency={currency}
+            exchangeRate={exchangeRate}
             onTermUnitChange={setTermUnit}
+            onCurrencyChange={setCurrency}
+            onExchangeRateChange={updateExchangeRate}
             onInputChange={updateInput}
           />
 
@@ -126,6 +153,8 @@ function App() {
               baselineTotalInterest={baselineResult.totalInterest}
               extraTotalInterest={extraResult.totalInterest}
               interestAvoided={interestAvoided}
+              currency={currency}
+              exchangeRate={resolvedExchangeRate}
             />
             <ComparisonCharts rows={chartRows} />
           </section>

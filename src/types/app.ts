@@ -1,4 +1,5 @@
 export type TermUnit = 'years' | 'months'
+export type CurrencyCode = 'USD' | 'BOB'
 
 export type InputState = {
   principal: number

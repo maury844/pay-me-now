@@ -3,6 +3,7 @@ import { AmortizationTableSection } from './components/AmortizationTableSection'
 import { ComparisonCharts } from './components/ComparisonCharts';
 import { InputsCard } from './components/InputsCard';
 import { SummaryCards } from './components/SummaryCards';
+import { useExchangeRate } from './hooks/useExchangeRate';
 import { simulate } from './simulation';
 import type { CurrencyCode, InputState, TermUnit } from './types/app';
 import { buildChartRows, toSafeNumber } from './utils/simulationView';
@@ -21,12 +22,8 @@ function App() {
   const [termUnit, setTermUnit] = useState<TermUnit>('years');
   const [inputs, setInputs] = useState<InputState>(defaultInputs);
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
-  const [exchangeRate, setExchangeRate] = useState(6.96);
-
-  const resolvedExchangeRate = useMemo(() => {
-    if (currency === 'USD') return 1;
-    return Math.max(0.0001, toSafeNumber(exchangeRate));
-  }, [currency, exchangeRate]);
+  const { exchangeRate, resolvedExchangeRate, onExchangeRateChange } =
+    useExchangeRate(currency);
 
   const principalUsd = useMemo(() => {
     const principal = toSafeNumber(inputs.principal);
@@ -119,10 +116,6 @@ function App() {
     }));
   };
 
-  const updateExchangeRate = (value: string) => {
-    setExchangeRate(Number(value));
-  };
-
   return (
     <main className='min-h-screen p-4 md:p-8'>
       <div className='mx-auto max-w-7xl space-y-4'>
@@ -141,7 +134,7 @@ function App() {
             exchangeRate={exchangeRate}
             onTermUnitChange={setTermUnit}
             onCurrencyChange={setCurrency}
-            onExchangeRateChange={updateExchangeRate}
+            onExchangeRateChange={onExchangeRateChange}
             onInputChange={updateInput}
           />
 

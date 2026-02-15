@@ -1,54 +1,54 @@
-import { useMemo, useState } from 'react'
-import { AmortizationTableSection } from './components/AmortizationTableSection'
-import { ComparisonCharts } from './components/ComparisonCharts'
-import { InputsCard } from './components/InputsCard'
-import { SummaryCards } from './components/SummaryCards'
-import { simulate } from './simulation'
-import type { CurrencyCode, InputState, TermUnit } from './types/app'
-import { buildChartRows, toSafeNumber } from './utils/simulationView'
+import { useMemo, useState } from 'react';
+import { AmortizationTableSection } from './components/AmortizationTableSection';
+import { ComparisonCharts } from './components/ComparisonCharts';
+import { InputsCard } from './components/InputsCard';
+import { SummaryCards } from './components/SummaryCards';
+import { simulate } from './simulation';
+import type { CurrencyCode, InputState, TermUnit } from './types/app';
+import { buildChartRows, toSafeNumber } from './utils/simulationView';
 
 const defaultInputs: InputState = {
-  principal: 300000,
+  principal: 1200000,
   termValue: 30,
-  fixedMonths: 60,
-  fixedApr: 4.5,
-  variableBaseApr: 6,
-  tre: 2.25,
+  fixedMonths: 12,
+  fixedApr: 7.5,
+  variableBaseApr: 7,
+  tre: 3.5,
   monthlyExtra: 250,
-}
+};
 
 function App() {
-  const [termUnit, setTermUnit] = useState<TermUnit>('years')
-  const [inputs, setInputs] = useState<InputState>(defaultInputs)
-  const [currency, setCurrency] = useState<CurrencyCode>('USD')
-  const [exchangeRate, setExchangeRate] = useState(6.96)
+  const [termUnit, setTermUnit] = useState<TermUnit>('years');
+  const [inputs, setInputs] = useState<InputState>(defaultInputs);
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [exchangeRate, setExchangeRate] = useState(6.96);
 
   const resolvedExchangeRate = useMemo(() => {
-    if (currency === 'USD') return 1
-    return Math.max(0.0001, toSafeNumber(exchangeRate))
-  }, [currency, exchangeRate])
+    if (currency === 'USD') return 1;
+    return Math.max(0.0001, toSafeNumber(exchangeRate));
+  }, [currency, exchangeRate]);
 
   const principalUsd = useMemo(() => {
-    const principal = toSafeNumber(inputs.principal)
-    if (currency === 'USD') return principal
-    return principal / resolvedExchangeRate
-  }, [currency, inputs.principal, resolvedExchangeRate])
+    const principal = toSafeNumber(inputs.principal);
+    if (currency === 'USD') return principal;
+    return principal / resolvedExchangeRate;
+  }, [currency, inputs.principal, resolvedExchangeRate]);
 
   const monthlyExtraUsd = useMemo(() => {
-    const monthlyExtra = toSafeNumber(inputs.monthlyExtra)
-    if (currency === 'USD') return monthlyExtra
-    return monthlyExtra / resolvedExchangeRate
-  }, [currency, inputs.monthlyExtra, resolvedExchangeRate])
+    const monthlyExtra = toSafeNumber(inputs.monthlyExtra);
+    if (currency === 'USD') return monthlyExtra;
+    return monthlyExtra / resolvedExchangeRate;
+  }, [currency, inputs.monthlyExtra, resolvedExchangeRate]);
 
   const termMonths = useMemo(() => {
     const rawMonths =
-      termUnit === 'years' ? inputs.termValue * 12 : inputs.termValue
-    return Math.max(1, Math.round(toSafeNumber(rawMonths)))
-  }, [inputs.termValue, termUnit])
+      termUnit === 'years' ? inputs.termValue * 12 : inputs.termValue;
+    return Math.max(1, Math.round(toSafeNumber(rawMonths)));
+  }, [inputs.termValue, termUnit]);
 
   const fixedMonths = useMemo(() => {
-    return Math.min(Math.round(toSafeNumber(inputs.fixedMonths)), termMonths)
-  }, [inputs.fixedMonths, termMonths])
+    return Math.min(Math.round(toSafeNumber(inputs.fixedMonths)), termMonths);
+  }, [inputs.fixedMonths, termMonths]);
 
   const baselineResult = useMemo(
     () =>
@@ -70,7 +70,7 @@ function App() {
       principalUsd,
       termMonths,
     ],
-  )
+  );
 
   const extraResult = useMemo(
     () =>
@@ -93,35 +93,35 @@ function App() {
       principalUsd,
       termMonths,
     ],
-  )
+  );
 
   const chartRows = useMemo(
     () => buildChartRows(baselineResult.rows, extraResult.rows),
     [baselineResult.rows, extraResult.rows],
-  )
+  );
 
   const monthsSaved = Math.max(
     0,
     baselineResult.payoffMonths - extraResult.payoffMonths,
-  )
+  );
   const interestAvoided = Math.max(
     0,
     baselineResult.totalInterest - extraResult.totalInterest,
-  )
+  );
   const variableTotalApr = (
     toSafeNumber(inputs.variableBaseApr) + toSafeNumber(inputs.tre)
-  ).toFixed(2)
+  ).toFixed(2);
 
   const updateInput = (key: keyof InputState, value: string) => {
     setInputs((prev) => ({
       ...prev,
       [key]: Number(value),
-    }))
-  }
+    }));
+  };
 
   const updateExchangeRate = (value: string) => {
-    setExchangeRate(Number(value))
-  }
+    setExchangeRate(Number(value));
+  };
 
   return (
     <main className='min-h-screen p-4 md:p-8'>
@@ -168,7 +168,7 @@ function App() {
         />
       </div>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

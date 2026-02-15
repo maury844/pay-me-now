@@ -104,7 +104,10 @@ export const simulate = (rawConfig: SimConfig): SimResult => {
     }
 
     const interest = toCurrency(balance * toMonthlyRate(apr))
-    const scheduledCap = toCurrency(Math.min(scheduledPayment, balance + interest))
+    const scheduledCap =
+      month === termMonths
+        ? toCurrency(balance + interest)
+        : toCurrency(Math.min(scheduledPayment, balance + interest))
     const scheduledPrincipal = toCurrency(Math.max(0, scheduledCap - interest))
 
     const maxExtra = toCurrency(Math.max(0, balance - scheduledPrincipal))

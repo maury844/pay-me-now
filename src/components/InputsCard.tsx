@@ -147,50 +147,52 @@ export function InputsCard({
           </div>
         </div>
 
-        {rateMode === 'FIXED_PLUS_VARIABLE' ? (
+        <div className='grid grid-cols-2 gap-2 sm:grid-cols-1'>
+          {rateMode === 'FIXED_PLUS_VARIABLE' ? (
+            <NumberField
+              label='Fixed period (months)'
+              value={inputs.fixedMonths}
+              min='0'
+              onChange={(value) => onInputChange('fixedMonths', value)}
+            />
+          ) : null}
+
           <NumberField
-            label='Fixed period (months)'
-            value={inputs.fixedMonths}
+            label='Fixed APR (%)'
+            value={inputs.fixedApr}
             min='0'
-            onChange={(value) => onInputChange('fixedMonths', value)}
+            step='0.01'
+            onChange={(value) => onInputChange('fixedApr', value)}
           />
-        ) : null}
 
-        <NumberField
-          label='Fixed APR (%)'
-          value={inputs.fixedApr}
-          min='0'
-          step='0.01'
-          onChange={(value) => onInputChange('fixedApr', value)}
-        />
+          {rateMode === 'FIXED_PLUS_VARIABLE' ? (
+            <>
+              <NumberField
+                label='Variable base APR (%)'
+                value={inputs.variableBaseApr}
+                min='0'
+                step='0.01'
+                onChange={(value) => onInputChange('variableBaseApr', value)}
+              />
 
-        {rateMode === 'FIXED_PLUS_VARIABLE' ? (
-          <>
-            <NumberField
-              label='Variable base APR (%)'
-              value={inputs.variableBaseApr}
-              min='0'
-              step='0.01'
-              onChange={(value) => onInputChange('variableBaseApr', value)}
-            />
+              <NumberField
+                label='TRE (%)'
+                value={inputs.tre}
+                min='0'
+                step='0.01'
+                onChange={(value) => onInputChange('tre', value)}
+              />
+            </>
+          ) : null}
 
-            <NumberField
-              label='TRE (%)'
-              value={inputs.tre}
-              min='0'
-              step='0.01'
-              onChange={(value) => onInputChange('tre', value)}
-            />
-          </>
-        ) : null}
-
-        <NumberField
-          label={`Extra payment / month (${currencyLabel})`}
-          value={inputs.monthlyExtra}
-          min='0'
-          step='0.01'
-          onChange={(value) => onInputChange('monthlyExtra', value)}
-        />
+          <NumberField
+            label={`Extra payment / month (${currencyLabel})`}
+            value={inputs.monthlyExtra}
+            min='0'
+            step='0.01'
+            onChange={(value) => onInputChange('monthlyExtra', value)}
+          />
+        </div>
 
         {rateMode === 'FIXED_PLUS_VARIABLE' ? (
           <div className='rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-300'>

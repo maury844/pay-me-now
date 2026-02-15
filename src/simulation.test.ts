@@ -45,4 +45,23 @@ describe('simulate', () => {
     expect(withExtra.payoffMonths).toBeLessThan(baseline.payoffMonths)
     expect(withExtra.totalInterest).toBeLessThan(baseline.totalInterest)
   })
+
+  it('does not exceed contractual term due to rounding in mixed-rate loans', () => {
+    const screenshotLikeConfig: SimConfig = {
+      principal: 1200000 / 9.09,
+      termMonths: 360,
+      fixedMonths: 12,
+      fixedApr: 7.5,
+      variableBaseApr: 7,
+      tre: 3.5,
+      monthlyExtra: 0,
+      mode: 'KEEP_PAYMENT',
+    }
+
+    const result = simulate(screenshotLikeConfig)
+
+    expect(result.payoffMonths).toBe(360)
+    expect(result.rows.at(-1)?.month).toBe(360)
+    expect(result.rows.at(-1)?.balance).toBe(0)
+  })
 })

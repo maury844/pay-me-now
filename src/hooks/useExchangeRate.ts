@@ -18,8 +18,12 @@ export const useExchangeRate = (currency: CurrencyCode): UseExchangeRateResult =
     DEFAULT_BOB_EXCHANGE_RATE,
   )
   const [hasCustomExchangeRate, setHasCustomExchangeRate] = useState(false)
+  const [hasFetchedBlueRate, setHasFetchedBlueRate] = useState(false)
 
   useEffect(() => {
+    if (currency !== 'BOB') return
+    if (hasFetchedBlueRate) return
+
     const controller = new AbortController()
 
     const loadDefaultRate = async () => {
@@ -30,6 +34,8 @@ export const useExchangeRate = (currency: CurrencyCode): UseExchangeRateResult =
         setDefaultBobExchangeRate(blueBuyRate)
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return
+      } finally {
+        setHasFetchedBlueRate(true)
       }
     }
 
@@ -38,7 +44,7 @@ export const useExchangeRate = (currency: CurrencyCode): UseExchangeRateResult =
     return () => {
       controller.abort()
     }
-  }, [])
+  }, [currency, hasFetchedBlueRate])
 
   useEffect(() => {
     if (currency !== 'BOB') return

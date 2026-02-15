@@ -5,7 +5,7 @@ import { InputsCard } from './components/InputsCard';
 import { SummaryCards } from './components/SummaryCards';
 import { useExchangeRate } from './hooks/useExchangeRate';
 import { simulate } from './simulation';
-import type { CurrencyCode, InputState, TermUnit } from './types/app';
+import type { CurrencyCode, InputState, RateMode, TermUnit } from './types/app';
 import { buildChartRows, toSafeNumber } from './utils/simulationView';
 
 const defaultInputs: InputState = {
@@ -20,6 +20,7 @@ const defaultInputs: InputState = {
 
 function App() {
   const [termUnit, setTermUnit] = useState<TermUnit>('years');
+  const [rateMode, setRateMode] = useState<RateMode>('FIXED_PLUS_VARIABLE');
   const [inputs, setInputs] = useState<InputState>(defaultInputs);
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const { exchangeRate, resolvedExchangeRate, onExchangeRateChange } =
@@ -46,13 +47,15 @@ function App() {
   const fixedMonths = useMemo(() => {
     return Math.min(Math.round(toSafeNumber(inputs.fixedMonths)), termMonths);
   }, [inputs.fixedMonths, termMonths]);
+  const effectiveFixedMonths =
+    rateMode === 'ALWAYS_FIXED' ? termMonths : fixedMonths;
 
   const baselineResult = useMemo(
     () =>
       simulate({
         principal: principalUsd,
         termMonths,
-        fixedMonths,
+        fixedMonths: effectiveFixedMonths,
         fixedApr: toSafeNumber(inputs.fixedApr),
         variableBaseApr: toSafeNumber(inputs.variableBaseApr),
         tre: toSafeNumber(inputs.tre),
@@ -60,7 +63,7 @@ function App() {
         mode: 'KEEP_PAYMENT',
       }),
     [
-      fixedMonths,
+      effectiveFixedMonths,
       inputs.fixedApr,
       inputs.tre,
       inputs.variableBaseApr,
@@ -74,7 +77,7 @@ function App() {
       simulate({
         principal: principalUsd,
         termMonths,
-        fixedMonths,
+        fixedMonths: effectiveFixedMonths,
         fixedApr: toSafeNumber(inputs.fixedApr),
         variableBaseApr: toSafeNumber(inputs.variableBaseApr),
         tre: toSafeNumber(inputs.tre),
@@ -82,7 +85,7 @@ function App() {
         mode: 'KEEP_PAYMENT',
       }),
     [
-      fixedMonths,
+      effectiveFixedMonths,
       inputs.fixedApr,
       inputs.tre,
       inputs.variableBaseApr,
@@ -129,10 +132,12 @@ function App() {
             inputs={inputs}
             termUnit={termUnit}
             termMonths={termMonths}
+            rateMode={rateMode}
             variableTotalApr={variableTotalApr}
             currency={currency}
             exchangeRate={exchangeRate}
             onTermUnitChange={setTermUnit}
+            onRateModeChange={setRateMode}
             onCurrencyChange={setCurrency}
             onExchangeRateChange={onExchangeRateChange}
             onInputChange={updateInput}

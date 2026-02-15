@@ -1,5 +1,6 @@
 export type TermUnit = 'years' | 'months'
 export type CurrencyCode = 'USD' | 'BOB'
+export type RateMode = 'FIXED_PLUS_VARIABLE' | 'ALWAYS_FIXED'
 
 export type InputState = {
   principal: number

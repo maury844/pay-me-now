@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { AmortizationRow } from '../simulation'
 import { currencyFormatter } from '../utils/format'
-import { cx } from '../utils/cx'
+import { classNameHelper } from '../utils/classNameHelper'
 import { Card } from './ui/Card'
 
 type TableScenario = 'extra' | 'baseline'
@@ -24,7 +24,7 @@ function ScenarioButton({
     <button
       type='button'
       onClick={onClick}
-      className={cx(
+      className={classNameHelper(
         'rounded-md px-3 py-1 text-sm',
         active ? 'bg-sky-500 text-slate-950' : 'bg-slate-800 text-slate-300',
       )}
@@ -57,7 +57,7 @@ export function AmortizationTableSection({
       </button>
 
       <div
-        className={cx(
+        className={classNameHelper(
           'overflow-hidden transition-all duration-300',
           isOpen ? 'mt-3 max-h-[70vh]' : 'max-h-0',
         )}

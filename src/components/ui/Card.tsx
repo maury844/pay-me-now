@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { cx } from '../../utils/cx'
+import { classNameHelper } from '../../utils/classNameHelper'
 
 type CardTone = 'default' | 'accent'
 
@@ -17,7 +17,7 @@ const toneClassMap: Record<CardTone, string> = {
 export function Card({ children, className, tone = 'default' }: CardProps) {
   return (
     <div
-      className={cx(
+      className={classNameHelper(
         'rounded-2xl border p-4',
         toneClassMap[tone],
         className,

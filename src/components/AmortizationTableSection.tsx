@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { AmortizationRow } from '../simulation'
-import { currencyFormatter } from '../utils/format'
+import type { CurrencyCode } from '../types/app'
+import { currencyFormatter, formatCurrency } from '../utils/format'
 import { classNameHelper } from '../utils/classNameHelper'
 import { Card } from './ui/Card'
 
@@ -9,6 +10,8 @@ type TableScenario = 'extra' | 'baseline'
 type AmortizationTableSectionProps = {
   baselineRows: AmortizationRow[]
   extraRows: AmortizationRow[]
+  currency: CurrencyCode
+  exchangeRate: number
 }
 
 function ScenarioButton({
@@ -37,6 +40,8 @@ function ScenarioButton({
 export function AmortizationTableSection({
   baselineRows,
   extraRows,
+  currency,
+  exchangeRate,
 }: AmortizationTableSectionProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [tableScenario, setTableScenario] = useState<TableScenario>('extra')
@@ -45,6 +50,10 @@ export function AmortizationTableSection({
     () => (tableScenario === 'extra' ? extraRows : baselineRows),
     [baselineRows, extraRows, tableScenario],
   )
+  const toSelectedCurrency = (usdAmount: number): number => {
+    if (currency === 'USD') return usdAmount
+    return usdAmount * exchangeRate
+  }
 
   return (
     <Card>
@@ -91,6 +100,9 @@ export function AmortizationTableSection({
                   <th className='px-3 py-2 text-left font-medium'>Principal</th>
                   <th className='px-3 py-2 text-left font-medium'>Balance</th>
                   <th className='px-3 py-2 text-left font-medium'>
+                    Balance ({currency})
+                  </th>
+                  <th className='px-3 py-2 text-left font-medium'>
                     Cumulative interest
                   </th>
                 </tr>
@@ -114,6 +126,9 @@ export function AmortizationTableSection({
                       {currencyFormatter.format(row.principal)}
                     </td>
                     <td className='px-3 py-2'>{currencyFormatter.format(row.balance)}</td>
+                    <td className='px-3 py-2'>
+                      {formatCurrency(toSelectedCurrency(row.balance), currency)}
+                    </td>
                     <td className='px-3 py-2'>
                       {currencyFormatter.format(row.cumulativeInterest)}
                     </td>

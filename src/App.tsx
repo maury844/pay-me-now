@@ -163,6 +163,8 @@ function App() {
         <AmortizationTableSection
           baselineRows={baselineResult.rows}
           extraRows={extraResult.rows}
+          currency={currency}
+          exchangeRate={resolvedExchangeRate}
         />
       </div>
     </main>

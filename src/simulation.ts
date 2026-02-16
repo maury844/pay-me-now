@@ -27,6 +27,13 @@ export type SimResult = {
   variableTotalApr: number
 }
 
+export type RequiredExtraResult = {
+  requiredMonthlyExtra: number
+  targetPayoffMonths: number
+  projectedPayoffMonths: number
+  noExtraNeeded: boolean
+}
+
 const toCurrency = (value: number): number => {
   return Math.round((value + Number.EPSILON) * 100) / 100
 }
@@ -59,6 +66,10 @@ const clampNonNegative = (value: number): number => {
 const clampIntegerNonNegative = (value: number): number => {
   if (!Number.isFinite(value)) return 0
   return Math.max(0, Math.round(value))
+}
+
+const roundUpToCents = (value: number): number => {
+  return Math.ceil(value * 100) / 100
 }
 
 export const simulate = (rawConfig: SimConfig): SimResult => {
@@ -136,5 +147,64 @@ export const simulate = (rawConfig: SimConfig): SimResult => {
     payoffMonths: rows.length,
     totalInterest: cumulativeInterest,
     variableTotalApr,
+  }
+}
+
+export const calculateRequiredMonthlyExtra = (
+  rawConfig: SimConfig,
+  targetPayoffMonthsRaw: number,
+): RequiredExtraResult => {
+  const targetPayoffMonths = Math.max(1, clampIntegerNonNegative(targetPayoffMonthsRaw))
+  const baseline = simulate({ ...rawConfig, monthlyExtra: 0, mode: 'KEEP_PAYMENT' })
+
+  if (baseline.payoffMonths <= targetPayoffMonths) {
+    return {
+      requiredMonthlyExtra: 0,
+      targetPayoffMonths,
+      projectedPayoffMonths: baseline.payoffMonths,
+      noExtraNeeded: true,
+    }
+  }
+
+  const maxExtra = clampNonNegative(rawConfig.principal)
+  let low = 0
+  let high = maxExtra
+
+  for (let iteration = 0; iteration < 40; iteration += 1) {
+    const mid = (low + high) / 2
+    const payoffMonths = simulate({
+      ...rawConfig,
+      monthlyExtra: mid,
+      mode: 'KEEP_PAYMENT',
+    }).payoffMonths
+
+    if (payoffMonths <= targetPayoffMonths) {
+      high = mid
+    } else {
+      low = mid
+    }
+  }
+
+  let requiredMonthlyExtra = roundUpToCents(high)
+  let projectedPayoffMonths = simulate({
+    ...rawConfig,
+    monthlyExtra: requiredMonthlyExtra,
+    mode: 'KEEP_PAYMENT',
+  }).payoffMonths
+
+  while (projectedPayoffMonths > targetPayoffMonths) {
+    requiredMonthlyExtra = roundUpToCents(requiredMonthlyExtra + 0.01)
+    projectedPayoffMonths = simulate({
+      ...rawConfig,
+      monthlyExtra: requiredMonthlyExtra,
+      mode: 'KEEP_PAYMENT',
+    }).payoffMonths
+  }
+
+  return {
+    requiredMonthlyExtra,
+    targetPayoffMonths,
+    projectedPayoffMonths,
+    noExtraNeeded: requiredMonthlyExtra === 0,
   }
 }

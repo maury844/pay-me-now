@@ -1,6 +1,6 @@
 import type { CurrencyCode, InputState, RateMode, TermUnit } from '../types/app'
 import { classNameHelper } from '../utils/classNameHelper'
-import { getCurrencyInputLabel } from '../utils/format'
+import { formatCurrency, getCurrencyInputLabel } from '../utils/format'
 import { Card } from './ui/Card'
 
 type InputsCardProps = {
@@ -9,10 +9,14 @@ type InputsCardProps = {
   termMonths: number
   rateMode: RateMode
   variableTotalApr: string
+  targetPayoffMonths: number
+  requiredExtraPerMonth: number
+  noExtraNeededForTarget: boolean
   currency: CurrencyCode
   exchangeRate: number
   onTermUnitChange: (next: TermUnit) => void
   onRateModeChange: (next: RateMode) => void
+  onTargetPayoffMonthsChange: (value: string) => void
   onCurrencyChange: (next: CurrencyCode) => void
   onExchangeRateChange: (value: string) => void
   onInputChange: (key: keyof InputState, value: string) => void
@@ -48,15 +52,20 @@ export function InputsCard({
   termMonths,
   rateMode,
   variableTotalApr,
+  targetPayoffMonths,
+  requiredExtraPerMonth,
+  noExtraNeededForTarget,
   currency,
   exchangeRate,
   onTermUnitChange,
   onRateModeChange,
+  onTargetPayoffMonthsChange,
   onCurrencyChange,
   onExchangeRateChange,
   onInputChange,
 }: InputsCardProps) {
   const currencyLabel = getCurrencyInputLabel(currency)
+  const requiredExtraDisplay = formatCurrency(requiredExtraPerMonth, currency)
 
   return (
     <Card className='lg:col-span-4'>
@@ -213,6 +222,27 @@ export function InputsCard({
             </p>
           </div>
         )}
+
+        <div className='rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-300'>
+          <p className='font-medium text-slate-100'>Payoff target planner</p>
+          <div className='mt-2'>
+            <NumberField
+              label='Target payoff (months)'
+              value={targetPayoffMonths}
+              min='1'
+              onChange={onTargetPayoffMonthsChange}
+            />
+          </div>
+          <p className='mt-2 text-slate-200'>
+            Required extra / month:{' '}
+            <span className='font-semibold text-sky-300'>{requiredExtraDisplay}</span>
+          </p>
+          <p className='mt-1 text-xs text-slate-400'>
+            {noExtraNeededForTarget
+              ? 'No extra is needed for this payoff target.'
+              : 'Apply this value in Extra payment / month to hit the target.'}
+          </p>
+        </div>
       </div>
     </Card>
   )

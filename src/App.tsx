@@ -5,7 +5,7 @@ import { InputsCard } from './components/InputsCard';
 import { SummaryCards } from './components/SummaryCards';
 import { useDebouncedValue } from './hooks/useDebouncedValue';
 import { useExchangeRate } from './hooks/useExchangeRate';
-import { simulate } from './simulation';
+import { calculateRequiredMonthlyExtra, simulate } from './simulation';
 import type { CurrencyCode, InputState, RateMode, TermUnit } from './types/app';
 import { buildChartRows, toSafeNumber } from './utils/simulationView';
 
@@ -25,6 +25,9 @@ function App() {
   const [termUnit, setTermUnit] = useState<TermUnit>('years');
   const [rateMode, setRateMode] = useState<RateMode>('FIXED_PLUS_VARIABLE');
   const [inputs, setInputs] = useState<InputState>(defaultInputs);
+  const [targetPayoffMonths, setTargetPayoffMonths] = useState(
+    defaultInputs.termValue * 12,
+  );
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const { exchangeRate, resolvedExchangeRate, onExchangeRateChange } =
     useExchangeRate(currency);
@@ -76,6 +79,14 @@ function App() {
     simulationConfig,
     CALCULATION_DEBOUNCE_MS,
   );
+  const normalizedTargetPayoffMonths = Math.max(
+    1,
+    Math.round(toSafeNumber(targetPayoffMonths)),
+  );
+  const { debouncedValue: debouncedTargetPayoffMonths } = useDebouncedValue(
+    normalizedTargetPayoffMonths,
+    CALCULATION_DEBOUNCE_MS,
+  );
 
   const baselineResult = useMemo(
     () =>
@@ -109,6 +120,22 @@ function App() {
     0,
     baselineResult.totalInterest - extraResult.totalInterest,
   );
+  const requiredExtraResult = useMemo(
+    () =>
+      calculateRequiredMonthlyExtra(
+        {
+          ...debouncedSimulationConfig,
+          monthlyExtra: 0,
+          mode: 'KEEP_PAYMENT',
+        },
+        debouncedTargetPayoffMonths,
+      ),
+    [debouncedSimulationConfig, debouncedTargetPayoffMonths],
+  );
+  const requiredExtraPerMonth = useMemo(() => {
+    if (currency === 'USD') return requiredExtraResult.requiredMonthlyExtra;
+    return requiredExtraResult.requiredMonthlyExtra * resolvedExchangeRate;
+  }, [currency, requiredExtraResult.requiredMonthlyExtra, resolvedExchangeRate]);
   const totalPaidSoFar = useMemo(
     () =>
       extraResult.rows.reduce((sum, row) => {
@@ -142,10 +169,16 @@ function App() {
             termMonths={termMonths}
             rateMode={rateMode}
             variableTotalApr={variableTotalApr}
+            targetPayoffMonths={targetPayoffMonths}
+            requiredExtraPerMonth={requiredExtraPerMonth}
+            noExtraNeededForTarget={requiredExtraResult.noExtraNeeded}
             currency={currency}
             exchangeRate={exchangeRate}
             onTermUnitChange={setTermUnit}
             onRateModeChange={setRateMode}
+            onTargetPayoffMonthsChange={(value) =>
+              setTargetPayoffMonths(Number(value))
+            }
             onCurrencyChange={setCurrency}
             onExchangeRateChange={onExchangeRateChange}
             onInputChange={updateInput}

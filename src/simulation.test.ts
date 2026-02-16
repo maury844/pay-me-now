@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { simulate, type SimConfig } from './simulation'
+import { calculateRequiredMonthlyExtra, simulate, type SimConfig } from './simulation'
 
 const baseConfig: SimConfig = {
   principal: 300000,
@@ -80,5 +80,27 @@ describe('simulate', () => {
     )
 
     expect(firstMonthExtraInBobs).toBe(expectedExtraInBobs)
+  })
+
+  it('returns zero extra when target payoff is not shorter than baseline', () => {
+    const baseline = simulate({ ...baseConfig, monthlyExtra: 0 })
+
+    const result = calculateRequiredMonthlyExtra(baseConfig, baseline.payoffMonths)
+
+    expect(result.requiredMonthlyExtra).toBe(0)
+    expect(result.noExtraNeeded).toBe(true)
+  })
+
+  it('finds required extra to meet a shorter payoff target', () => {
+    const targetPayoffMonths = 300
+
+    const result = calculateRequiredMonthlyExtra(baseConfig, targetPayoffMonths)
+    const withRequiredExtra = simulate({
+      ...baseConfig,
+      monthlyExtra: result.requiredMonthlyExtra,
+    })
+
+    expect(result.requiredMonthlyExtra).toBeGreaterThan(0)
+    expect(withRequiredExtra.payoffMonths).toBeLessThanOrEqual(targetPayoffMonths)
   })
 })

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { AmortizationRow } from '../simulation'
 import type { CurrencyCode } from '../types/app'
-import { currencyFormatter, formatCurrency } from '../utils/format'
+import { formatCurrency } from '../utils/format'
 import { classNameHelper } from '../utils/classNameHelper'
 import { Card } from './ui/Card'
 
@@ -54,15 +54,19 @@ export function AmortizationTableSection({
     if (currency === 'USD') return usdAmount
     return usdAmount * exchangeRate
   }
+  const formatMoney = (usdAmount: number): string => {
+    return formatCurrency(toSelectedCurrency(usdAmount), currency)
+  }
 
   return (
     <Card>
       <button
         type='button'
         onClick={() => setIsOpen((current) => !current)}
-        className='w-full rounded-lg border border-slate-600 bg-slate-950 px-4 py-3 text-left font-medium text-slate-100 transition hover:border-sky-400'
+        className='flex w-full items-center justify-between rounded-lg border border-slate-600 bg-slate-950 px-4 py-3 text-left font-medium text-slate-100 transition hover:border-sky-400'
       >
-        {isOpen ? 'Hide amortization table' : 'Show amortization table'}
+        <span>Table</span>
+        <span className='text-lg leading-none text-slate-300'>{isOpen ? 'v' : '>'}</span>
       </button>
 
       <div
@@ -94,17 +98,22 @@ export function AmortizationTableSection({
                     <th className='px-3 py-2 text-left font-medium'>Month</th>
                     <th className='px-3 py-2 text-left font-medium'>APR (total)</th>
                     <th className='px-3 py-2 text-left font-medium'>
-                      Scheduled payment
+                      Scheduled payment ({currency})
                     </th>
-                    <th className='px-3 py-2 text-left font-medium'>Extra</th>
-                    <th className='px-3 py-2 text-left font-medium'>Interest</th>
-                    <th className='px-3 py-2 text-left font-medium'>Principal</th>
-                    <th className='px-3 py-2 text-left font-medium'>Balance</th>
+                    <th className='px-3 py-2 text-left font-medium'>
+                      Extra ({currency})
+                    </th>
+                    <th className='px-3 py-2 text-left font-medium'>
+                      Interest ({currency})
+                    </th>
+                    <th className='px-3 py-2 text-left font-medium'>
+                      Principal ({currency})
+                    </th>
                     <th className='px-3 py-2 text-left font-medium'>
                       Balance ({currency})
                     </th>
                     <th className='px-3 py-2 text-left font-medium'>
-                      Cumulative interest
+                      Cumulative interest ({currency})
                     </th>
                   </tr>
                 </thead>
@@ -116,23 +125,12 @@ export function AmortizationTableSection({
                     >
                       <td className='px-3 py-2'>{row.month}</td>
                       <td className='px-3 py-2'>{row.apr.toFixed(2)}%</td>
-                      <td className='px-3 py-2'>
-                        {currencyFormatter.format(row.scheduledPayment)}
-                      </td>
-                      <td className='px-3 py-2'>{currencyFormatter.format(row.extra)}</td>
-                      <td className='px-3 py-2'>
-                        {currencyFormatter.format(row.interest)}
-                      </td>
-                      <td className='px-3 py-2'>
-                        {currencyFormatter.format(row.principal)}
-                      </td>
-                      <td className='px-3 py-2'>{currencyFormatter.format(row.balance)}</td>
-                      <td className='px-3 py-2'>
-                        {formatCurrency(toSelectedCurrency(row.balance), currency)}
-                      </td>
-                      <td className='px-3 py-2'>
-                        {currencyFormatter.format(row.cumulativeInterest)}
-                      </td>
+                      <td className='px-3 py-2'>{formatMoney(row.scheduledPayment)}</td>
+                      <td className='px-3 py-2'>{formatMoney(row.extra)}</td>
+                      <td className='px-3 py-2'>{formatMoney(row.interest)}</td>
+                      <td className='px-3 py-2'>{formatMoney(row.principal)}</td>
+                      <td className='px-3 py-2'>{formatMoney(row.balance)}</td>
+                      <td className='px-3 py-2'>{formatMoney(row.cumulativeInterest)}</td>
                     </tr>
                   ))}
                 </tbody>

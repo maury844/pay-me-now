@@ -109,6 +109,13 @@ function App() {
     0,
     baselineResult.totalInterest - extraResult.totalInterest,
   );
+  const totalPaidSoFar = useMemo(
+    () =>
+      extraResult.rows.reduce((sum, row) => {
+        return sum + row.scheduledPayment + row.extra;
+      }, 0),
+    [extraResult.rows],
+  );
   const variableTotalApr = (
     toSafeNumber(inputs.variableBaseApr) + toSafeNumber(inputs.tre)
   ).toFixed(2);
@@ -152,6 +159,7 @@ function App() {
               baselineTotalInterest={baselineResult.totalInterest}
               extraTotalInterest={extraResult.totalInterest}
               interestAvoided={interestAvoided}
+              totalPaidSoFar={totalPaidSoFar}
               currency={currency}
               exchangeRate={resolvedExchangeRate}
             />

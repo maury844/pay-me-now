@@ -9,6 +9,7 @@ type SummaryCardsProps = {
   baselineTotalInterest: number
   extraTotalInterest: number
   interestAvoided: number
+  totalPaidSoFar: number
   currency: CurrencyCode
   exchangeRate: number
 }
@@ -20,6 +21,7 @@ export function SummaryCards({
   baselineTotalInterest,
   extraTotalInterest,
   interestAvoided,
+  totalPaidSoFar,
   currency,
   exchangeRate,
 }: SummaryCardsProps) {
@@ -39,6 +41,7 @@ export function SummaryCards({
   const baselineInterestDisplay = moneyCardValues(baselineTotalInterest)
   const extraInterestDisplay = moneyCardValues(extraTotalInterest)
   const interestAvoidedDisplay = moneyCardValues(interestAvoided)
+  const totalPaidSoFarDisplay = moneyCardValues(totalPaidSoFar)
 
   return (
     <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
@@ -68,6 +71,11 @@ export function SummaryCards({
         value={interestAvoidedDisplay.value}
         subValue={interestAvoidedDisplay.subValue}
         accent
+      />
+      <MetricCard
+        title='Total paid so far'
+        value={totalPaidSoFarDisplay.value}
+        subValue={totalPaidSoFarDisplay.subValue}
       />
     </div>
   )

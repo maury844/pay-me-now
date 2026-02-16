@@ -9,7 +9,7 @@ import { simulate } from './simulation';
 import type { CurrencyCode, InputState, RateMode, TermUnit } from './types/app';
 import { buildChartRows, toSafeNumber } from './utils/simulationView';
 
-const CALCULATION_DEBOUNCE_MS = 1000;
+const CALCULATION_DEBOUNCE_MS = 250;
 
 const defaultInputs: InputState = {
   principal: 1200000,
@@ -72,7 +72,7 @@ function App() {
       termMonths,
     ],
   );
-  const debouncedSimulationConfig = useDebouncedValue(
+  const { debouncedValue: debouncedSimulationConfig } = useDebouncedValue(
     simulationConfig,
     CALCULATION_DEBOUNCE_MS,
   );

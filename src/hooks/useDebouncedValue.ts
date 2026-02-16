@@ -1,17 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
-export const useDebouncedValue = <T,>(value: T, delayMs: number): T => {
+type UseDebouncedValueResult<T> = {
+  debouncedValue: T
+  isPending: boolean
+}
+
+export const useDebouncedValue = <T,>(
+  value: T,
+  delayMs: number,
+): UseDebouncedValueResult<T> => {
   const [debouncedValue, setDebouncedValue] = useState(value)
+  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setDebouncedValue(value)
+      startTransition(() => {
+        setDebouncedValue(value)
+      })
     }, delayMs)
 
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [delayMs, value])
+  }, [delayMs, startTransition, value])
 
-  return debouncedValue
+  return {
+    debouncedValue,
+    isPending,
+  }
 }

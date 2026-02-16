@@ -3,10 +3,13 @@ import { AmortizationTableSection } from './components/AmortizationTableSection'
 import { ComparisonCharts } from './components/ComparisonCharts';
 import { InputsCard } from './components/InputsCard';
 import { SummaryCards } from './components/SummaryCards';
+import { useDebouncedValue } from './hooks/useDebouncedValue';
 import { useExchangeRate } from './hooks/useExchangeRate';
 import { simulate } from './simulation';
 import type { CurrencyCode, InputState, RateMode, TermUnit } from './types/app';
 import { buildChartRows, toSafeNumber } from './utils/simulationView';
+
+const CALCULATION_DEBOUNCE_MS = 1000;
 
 const defaultInputs: InputState = {
   principal: 1200000,
@@ -49,41 +52,16 @@ function App() {
   }, [inputs.fixedMonths, termMonths]);
   const effectiveFixedMonths =
     rateMode === 'ALWAYS_FIXED' ? termMonths : fixedMonths;
-
-  const baselineResult = useMemo(
-    () =>
-      simulate({
-        principal: principalUsd,
-        termMonths,
-        fixedMonths: effectiveFixedMonths,
-        fixedApr: toSafeNumber(inputs.fixedApr),
-        variableBaseApr: toSafeNumber(inputs.variableBaseApr),
-        tre: toSafeNumber(inputs.tre),
-        monthlyExtra: 0,
-        mode: 'KEEP_PAYMENT',
-      }),
-    [
-      effectiveFixedMonths,
-      inputs.fixedApr,
-      inputs.tre,
-      inputs.variableBaseApr,
-      principalUsd,
+  const simulationConfig = useMemo(
+    () => ({
+      principal: principalUsd,
       termMonths,
-    ],
-  );
-
-  const extraResult = useMemo(
-    () =>
-      simulate({
-        principal: principalUsd,
-        termMonths,
-        fixedMonths: effectiveFixedMonths,
-        fixedApr: toSafeNumber(inputs.fixedApr),
-        variableBaseApr: toSafeNumber(inputs.variableBaseApr),
-        tre: toSafeNumber(inputs.tre),
-        monthlyExtra: monthlyExtraUsd,
-        mode: 'KEEP_PAYMENT',
-      }),
+      fixedMonths: effectiveFixedMonths,
+      fixedApr: toSafeNumber(inputs.fixedApr),
+      variableBaseApr: toSafeNumber(inputs.variableBaseApr),
+      tre: toSafeNumber(inputs.tre),
+      monthlyExtra: monthlyExtraUsd,
+    }),
     [
       effectiveFixedMonths,
       inputs.fixedApr,
@@ -93,6 +71,29 @@ function App() {
       principalUsd,
       termMonths,
     ],
+  );
+  const debouncedSimulationConfig = useDebouncedValue(
+    simulationConfig,
+    CALCULATION_DEBOUNCE_MS,
+  );
+
+  const baselineResult = useMemo(
+    () =>
+      simulate({
+        ...debouncedSimulationConfig,
+        monthlyExtra: 0,
+        mode: 'KEEP_PAYMENT',
+      }),
+    [debouncedSimulationConfig],
+  );
+
+  const extraResult = useMemo(
+    () =>
+      simulate({
+        ...debouncedSimulationConfig,
+        mode: 'KEEP_PAYMENT',
+      }),
+    [debouncedSimulationConfig],
   );
 
   const chartRows = useMemo(

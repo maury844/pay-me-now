@@ -76,7 +76,7 @@ export const simulate = (rawConfig: SimConfig): SimResult => {
   const termMonths = Math.max(1, config.termMonths)
   const fixedMonths = Math.min(config.fixedMonths, termMonths)
   const variableTotalApr = toCurrency(config.variableBaseApr + config.tre)
-  const monthlyExtra = toCurrency(config.monthlyExtra)
+  const monthlyExtra = config.monthlyExtra
 
   let month = 1
   let balance = toCurrency(config.principal)
@@ -111,7 +111,7 @@ export const simulate = (rawConfig: SimConfig): SimResult => {
     const scheduledPrincipal = toCurrency(Math.max(0, scheduledCap - interest))
 
     const maxExtra = toCurrency(Math.max(0, balance - scheduledPrincipal))
-    const extra = toCurrency(Math.min(monthlyExtra, maxExtra))
+    const extra = Math.min(monthlyExtra, maxExtra)
 
     const principal = toCurrency(scheduledPrincipal + extra)
     balance = toCurrency(Math.max(0, balance - principal))

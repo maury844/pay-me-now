@@ -64,4 +64,21 @@ describe('simulate', () => {
     expect(result.rows.at(-1)?.month).toBe(360)
     expect(result.rows.at(-1)?.balance).toBe(0)
   })
+
+  it('preserves extra precision for converted-currency inputs', () => {
+    const exchangeRate = 9.09
+    const expectedExtraInBobs = 250
+
+    const result = simulate({
+      ...baseConfig,
+      principal: 1200000 / exchangeRate,
+      monthlyExtra: expectedExtraInBobs / exchangeRate,
+    })
+
+    const firstMonthExtraInBobs = Number(
+      ((result.rows[0]?.extra ?? 0) * exchangeRate).toFixed(2),
+    )
+
+    expect(firstMonthExtraInBobs).toBe(expectedExtraInBobs)
+  })
 })

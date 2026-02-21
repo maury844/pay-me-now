@@ -158,8 +158,13 @@ function App() {
     <main className='min-h-screen p-4 md:p-8'>
       <div className='mx-auto max-w-7xl space-y-4'>
         <header className='space-y-1'>
-          <h1 className='text-3xl font-bold text-slate-100'>Money Moves</h1>
-          <p className='text-slate-300'>Mortgage Extra-Payment Simulator</p>
+          <h1 className='text-3xl font-bold text-slate-100'>
+            Money Moves Mortgage Simulator
+          </h1>
+          <p className='max-w-2xl text-slate-300'>
+            Compare baseline and extra-payment scenarios to estimate payoff
+            time, total interest, and required monthly overpayment.
+          </p>
         </header>
 
         <div className='grid gap-4 lg:grid-cols-12'>

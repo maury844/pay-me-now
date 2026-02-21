@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Money Moves social preview">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#22c55e" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1050" cy="90" r="180" fill="#0ea5e9" opacity="0.12" />
+  <circle cx="140" cy="560" r="200" fill="#22c55e" opacity="0.1" />
+
+  <rect x="80" y="120" width="190" height="190" rx="42" fill="#020617" stroke="#1e293b" stroke-width="4" />
+  <path
+    d="M118 214L176 160L234 214V266C234 270.4 230.4 274 226 274H126C121.6 274 118 270.4 118 266V214Z"
+    fill="none"
+    stroke="url(#accent)"
+    stroke-width="12"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M146 274V226H206V274"
+    fill="none"
+    stroke="url(#accent)"
+    stroke-width="12"
+    stroke-linecap="round"
+  />
+
+  <text x="310" y="210" fill="#f8fafc" font-size="62" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif" font-weight="700">
+    Money Moves
+  </text>
+  <text x="310" y="280" fill="#cbd5e1" font-size="40" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif">
+    Mortgage Extra-Payment Simulator
+  </text>
+  <text x="310" y="350" fill="#94a3b8" font-size="30" font-family="Segoe UI, Tahoma, Geneva, Verdana, sans-serif">
+    Compare payoff timeline, interest cost, and savings in one view.
+  </text>
+</svg>

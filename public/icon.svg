@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Money Moves app icon">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#22c55e" />
+    </linearGradient>
+  </defs>
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="#020617" />
+  <path
+    d="M116 252L256 126L396 252V378C396 387.9 387.9 396 378 396H134C124.1 396 116 387.9 116 378V252Z"
+    fill="none"
+    stroke="url(#iconGradient)"
+    stroke-width="34"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M184 396V280H328V396"
+    fill="none"
+    stroke="url(#iconGradient)"
+    stroke-width="34"
+    stroke-linecap="round"
+  />
+  <path
+    d="M168 172H344"
+    fill="none"
+    stroke="#f8fafc"
+    stroke-width="24"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+</svg>

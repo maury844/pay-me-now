@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# Money Moves Mortgage Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive mortgage extra-payment simulator built with React, TypeScript, and Vite.  
+Use it to compare baseline vs accelerated payoff scenarios and understand how extra monthly payments affect total interest.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Side-by-side mortgage simulation: baseline payment vs extra-payment strategy.
+- Fixed-rate and mixed-rate support (fixed period + variable base APR + TRE).
+- Adjustable term in years or months.
+- Payoff optimization: calculates required monthly extra to hit a target payoff month.
+- Amortization table and comparison charts for balance and cumulative interest.
+- USD and BOB support with a fetched BOB blue buy reference rate and manual override.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript 5
+- Vite 7
+- Tailwind CSS
+- Recharts
+- Vitest
 
-## Expanding the ESLint configuration
+## Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 20+
+- npm 10+
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Run
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the local URL shown by Vite (usually `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `npm run dev`: Start development server.
+- `npm run build`: Type-check and produce production build in `dist/`.
+- `npm run preview`: Preview the production build locally.
+- `npm run lint`: Run ESLint.
+- `npm run test`: Run unit tests (Vitest).
+
+## Calculation Notes
+
+- Uses standard amortization payment formula per stage.
+- Recalculates scheduled payment when moving from fixed stage to variable stage.
+- Applies extra payment directly to principal after scheduled payment.
+- Rounds monetary outputs to cents for display and table consistency.
+
+## SEO and Metadata
+
+This project includes production-oriented discoverability assets:
+
+- HTML metadata for description, robots, Open Graph, and Twitter cards.
+- Structured data (`WebApplication`) in `index.html`.
+- Branded favicon, icon, and social preview assets in `public/`.
+- `site.webmanifest` and `robots.txt` under `public/`.
+
+If you deploy under a custom domain, update URLs/meta fields as needed for your host.
+
+## Data Source
+
+For BOB exchange defaults, the app attempts to fetch a blue buy rate from:
+
+- `https://api.dolarbluebolivia.click/fetch/generate`
+
+If unavailable, it falls back to a local default rate.
+
+## Disclaimer
+
+This simulator is educational and planning-oriented. It is not financial advice.  
+Always verify final loan terms and payment impacts with your lender.

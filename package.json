@@ -1,8 +1,18 @@
 {
   "name": "mortgage-simulator",
+  "description": "Interactive mortgage extra-payment simulator for comparing payoff timelines, interest savings, and amortization schedules.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "keywords": [
+    "mortgage",
+    "amortization",
+    "finance",
+    "calculator",
+    "extra-payment",
+    "react",
+    "vite"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

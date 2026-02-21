@@ -65,9 +65,8 @@ If you deploy under a custom domain, update URLs/meta fields as needed for your 
 
 ## Data Source
 
-For BOB exchange defaults, the app attempts to fetch a blue buy rate from:
-
-- `https://api.dolarbluebolivia.click/fetch/generate`
+For BOB exchange defaults, the app can optionally fetch a blue buy rate from a
+configured third-party endpoint.
 
 If unavailable, it falls back to a local default rate.
 
